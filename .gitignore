@@ -1,0 +1,25 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# Build output
+/build/
+
+# Composer / npm lock noise (keep composer.lock for apps; this is a plugin)
+composer.lock
+package-lock.json
+
+# Tooling caches
+.phpunit.result.cache
+.phpcs.cache
+
+# Editor / OS
+.idea/
+.vscode/
+*.sublime-*
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
