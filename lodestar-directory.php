@@ -32,7 +32,7 @@ define( 'LODESTAR_MIN_PHP', '8.1' );
 define( 'LODESTAR_MIN_WP', '6.4' );
 
 // Schema version. Bumped only when a new migration is added (see MigrationRunner).
-define( 'LODESTAR_DB_VERSION', '1.0.0' );
+define( 'LODESTAR_DB_VERSION', '1.1.0' );
 
 define( 'LODESTAR_FILE', __FILE__ );
 define( 'LODESTAR_BASENAME', plugin_basename( __FILE__ ) );

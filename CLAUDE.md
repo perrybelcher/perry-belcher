@@ -116,9 +116,16 @@ tests/                   PHPUnit + WP test suite
   **DoD:** Activates cleanly on a stock install, no notices/warnings with
   `WP_DEBUG` on; deactivation leaves no orphaned cron; migration runner applies
   an empty baseline and records the version.
-- **Phase 1 — Data layer.** CPT + taxonomies, all §3 tables, ListingRepository,
-  FieldIndexer, SearchQuery DTO, QueryBuilder. **DoD: 50k listings, <150ms
-  3-facet + radius query. The whole bet — do not advance until it passes.**
+- **Phase 1 — Data layer.** ✅ *(current)* CPT (`ld_listing`) + taxonomies, all
+  §3 tables (migration `1.1.0`), `ListingRepository`, `FieldIndexer`,
+  `SearchQuery`/`Facet`/`GeoFilter`/`SearchResult` DTOs, `QueryBuilder`,
+  `Geohash`. Facet search uses indexed EXISTS subqueries + a lat/lng
+  bounding-box prefilter + haversine refine — never `meta_query`. Taxonomy terms
+  are denormalised into `field_index` (`ld_category`/`ld_location`/`ld_tag`,
+  term ID in `value_num`) so they facet like any field. **DoD: 50k listings,
+  <150ms 3-facet + radius query** — see `tests/benchmark/` (run the `mysql`
+  driver for the authoritative gate; the SQLite proxy proves the access pattern
+  is index-driven).
 - **Phase 2 — Directory types & field/form system.**
 - **Phase 3 — Front-end submission & user dashboard.** (Security review every
   write path.)

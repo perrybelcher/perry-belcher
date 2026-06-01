@@ -64,7 +64,16 @@ final class Plugin {
 		$this->booted = true;
 
 		add_action( 'init', array( $this, 'load_textdomain' ) );
+		add_action( 'init', array( $this, 'register_content_types' ) );
 		add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
+	}
+
+	/**
+	 * Register the listing CPT and its taxonomies.
+	 */
+	public function register_content_types(): void {
+		( new PostType\ListingPostType() )->register();
+		( new PostType\Taxonomies() )->register();
 	}
 
 	/**

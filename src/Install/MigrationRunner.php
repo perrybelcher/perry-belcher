@@ -104,8 +104,13 @@ final class MigrationRunner {
 					return '';
 				},
 			),
-			// Phase 1+ migrations are appended below, e.g.:
-			// array( 'version' => '1.1.0', 'sql' => fn( $prefix, $charset ) => "CREATE TABLE {$prefix}lodestar_listing_data ( ... ) {$charset};" ),
+			array(
+				// Phase 1 — the custom table set (SDD §3).
+				'version' => '1.1.0',
+				'sql'     => static function ( string $prefix, string $charset ): string {
+					return Schema::statements( $prefix, $charset );
+				},
+			),
 		);
 	}
 

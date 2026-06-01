@@ -45,6 +45,11 @@ final class Activator {
 
 		self::schedule_cron();
 
+		// Register the CPT/taxonomies now so rewrite rules are primed correctly
+		// on activation (the `init` hook has not run for this request yet).
+		( new \Lodestar\PostType\ListingPostType() )->register();
+		( new \Lodestar\PostType\Taxonomies() )->register();
+
 		flush_rewrite_rules();
 	}
 

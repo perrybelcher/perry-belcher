@@ -40,3 +40,7 @@ tests_add_filter(
 );
 
 require $lodestar_tests_dir . '/includes/bootstrap.php';
+
+// Ensure the custom tables exist for integration tests. DDL is not rolled back
+// by the per-test transaction, so running it once here is sufficient.
+( new \Lodestar\Install\MigrationRunner( $GLOBALS['wpdb'] ) )->run();

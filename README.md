@@ -48,8 +48,13 @@ Built phase-by-phase, gated on each phase's Definition of Done.
 | Phase | Scope                                   | Status |
 |-------|-----------------------------------------|--------|
 | 0     | Scaffold & infrastructure               | ✅ done |
-| 1     | Data layer (50k / <150ms facet query)   | ⏳ next |
-| 2–9   | Types, submission, search, AEO, money…  | ☐      |
+| 1     | Data layer (50k / <150ms facet query)   | ✅ done |
+| 2     | Directory types & field/form system     | ⏳ next |
+| 3–9   | Submission, search, AEO, money, AI, API… | ☐      |
+
+The Phase 1 faceted-search bet is validated by `tests/benchmark/` — the real
+`QueryBuilder` output runs index-driven (bounding-box prefilter + indexed facet
+lookups), not via `wp_postmeta` self-joins.
 
 ## License
 
