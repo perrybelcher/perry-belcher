@@ -43,7 +43,15 @@ final class Activator {
 		( new MigrationRunner( $wpdb ) )->run();
 		update_option( 'lodestar_db_version', LODESTAR_DB_VERSION );
 
+		// Seed a baseline directory type so a stock install is usable at once.
+		( new \Lodestar\DirectoryType\DirectoryTypeManager( $wpdb ) )->ensureDefault();
+
 		self::schedule_cron();
+
+		// Register the CPT/taxonomies now so rewrite rules are primed correctly
+		// on activation (the `init` hook has not run for this request yet).
+		( new \Lodestar\PostType\ListingPostType() )->register();
+		( new \Lodestar\PostType\Taxonomies() )->register();
 
 		flush_rewrite_rules();
 	}

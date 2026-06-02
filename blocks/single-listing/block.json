@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lodestar/single-listing",
+	"version": "0.1.0",
+	"title": "Lodestar Listing Details",
+	"category": "lodestar",
+	"icon": "list-view",
+	"description": "Structured field/FAQ details for the current listing.",
+	"textdomain": "lodestar",
+	"keywords": [ "directory", "listing", "details" ],
+	"supports": { "html": false },
+	"attributes": {},
+	"editorScript": "lodestar-blocks",
+	"style": "lodestar",
+	"render": "file:./render.php"
+}

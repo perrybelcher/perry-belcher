@@ -1,0 +1,262 @@
+/**
+ * Lodestar front-end styles.
+ *
+ * Scoped under `.lodestar` so nothing bleeds into the active theme. No global
+ * resets, no element selectors outside the namespace.
+ */
+
+.lodestar {
+	--lodestar-gap: 1rem;
+	--lodestar-border: #d8dde3;
+	--lodestar-accent: #2563eb;
+}
+
+.lodestar * {
+	box-sizing: border-box;
+}
+
+/* Forms ------------------------------------------------------------------- */
+
+.lodestar-field {
+	margin-bottom: var(--lodestar-gap);
+}
+
+.lodestar-field__label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 0.35rem;
+}
+
+.lodestar-input,
+.lodestar-select,
+.lodestar-textarea {
+	width: 100%;
+	max-width: 28rem;
+	padding: 0.5rem 0.65rem;
+	border: 1px solid var(--lodestar-border);
+	border-radius: 6px;
+}
+
+.lodestar-input--min,
+.lodestar-input--max,
+.lodestar-input--radius {
+	width: 8rem;
+	display: inline-block;
+}
+
+.lodestar-required {
+	color: #dc2626;
+}
+
+/* Buttons ----------------------------------------------------------------- */
+
+.lodestar-button {
+	display: inline-block;
+	padding: 0.5rem 1rem;
+	border: 1px solid var(--lodestar-border);
+	border-radius: 6px;
+	background: #fff;
+	cursor: pointer;
+	text-decoration: none;
+	color: inherit;
+}
+
+.lodestar-button--primary {
+	background: var(--lodestar-accent);
+	border-color: var(--lodestar-accent);
+	color: #fff;
+}
+
+.lodestar-button--danger {
+	color: #dc2626;
+}
+
+/* Search ------------------------------------------------------------------ */
+
+.lodestar-search__filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--lodestar-gap);
+	align-items: flex-end;
+	margin-bottom: var(--lodestar-gap);
+}
+
+.lodestar-facet__label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 0.35rem;
+}
+
+.lodestar-facet__option {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	margin-right: 0.75rem;
+}
+
+.lodestar-results {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.lodestar-result {
+	padding: 0.75rem 0;
+	border-bottom: 1px solid var(--lodestar-border);
+}
+
+.lodestar-result__title {
+	font-weight: 600;
+}
+
+.lodestar-result__distance,
+.lodestar-result__rating {
+	margin-left: 0.5rem;
+	color: #6b7280;
+	font-size: 0.9em;
+}
+
+.lodestar-pagination {
+	display: flex;
+	gap: var(--lodestar-gap);
+	align-items: center;
+	margin-top: var(--lodestar-gap);
+}
+
+/* Map --------------------------------------------------------------------- */
+
+.lodestar-map {
+	width: 100%;
+	min-height: 360px;
+	margin-bottom: var(--lodestar-gap);
+	border: 1px solid var(--lodestar-border);
+	border-radius: 6px;
+}
+
+/* Dashboard / tables ------------------------------------------------------ */
+
+.lodestar-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.lodestar-table th,
+.lodestar-table td {
+	text-align: left;
+	padding: 0.5rem 0.65rem;
+	border-bottom: 1px solid var(--lodestar-border);
+}
+
+.lodestar-errors {
+	border: 1px solid #dc2626;
+	background: #fef2f2;
+	border-radius: 6px;
+	padding: 0.5rem 1rem;
+	margin-bottom: var(--lodestar-gap);
+}
+
+.lodestar-notice {
+	border: 1px solid var(--lodestar-accent);
+	background: #eff6ff;
+	border-radius: 6px;
+	padding: 0.5rem 1rem;
+	margin-bottom: var(--lodestar-gap);
+}
+
+/* Grid + cards (blocks) ---------------------------------------------------- */
+
+.lodestar-grid__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: var(--lodestar-gap);
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.lodestar-card {
+	border: 1px solid var(--lodestar-border);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.lodestar-card--featured {
+	border-color: var(--lodestar-accent);
+	box-shadow: 0 0 0 1px var(--lodestar-accent);
+}
+
+.lodestar-card__link {
+	display: block;
+	text-decoration: none;
+	color: inherit;
+}
+
+.lodestar-card__image {
+	width: 100%;
+	height: 150px;
+	object-fit: cover;
+	display: block;
+}
+
+.lodestar-card__title {
+	display: block;
+	font-weight: 600;
+	padding: 0.5rem 0.65rem 0;
+}
+
+.lodestar-card__rating {
+	display: block;
+	padding: 0.25rem 0.65rem 0.65rem;
+	color: #6b7280;
+	font-size: 0.9em;
+}
+
+/* Single listing ----------------------------------------------------------- */
+
+.lodestar-single__fields {
+	display: grid;
+	grid-template-columns: max-content 1fr;
+	gap: 0.35rem 1rem;
+	margin: 0 0 var(--lodestar-gap);
+}
+
+.lodestar-single__label {
+	font-weight: 600;
+}
+
+.lodestar-single__value {
+	margin: 0;
+}
+
+/* FAQ ---------------------------------------------------------------------- */
+
+.lodestar-faq__item {
+	border-bottom: 1px solid var(--lodestar-border);
+	padding: 0.5rem 0;
+}
+
+.lodestar-faq__q {
+	cursor: pointer;
+	font-weight: 600;
+}
+
+/* Intake ------------------------------------------------------------------- */
+
+.lodestar-intake {
+	border: 1px dashed var(--lodestar-border);
+	border-radius: 8px;
+	padding: 0.75rem 1rem;
+	margin-bottom: var(--lodestar-gap);
+}
+
+.lodestar-intake__row {
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.lodestar-intake__note {
+	color: #6b7280;
+	font-size: 0.85em;
+	margin: 0.35rem 0 0;
+}

@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lodestar/listings-grid",
+	"version": "0.1.0",
+	"title": "Lodestar Listings Grid",
+	"category": "lodestar",
+	"icon": "grid-view",
+	"description": "A grid of listings, optionally filtered by category.",
+	"textdomain": "lodestar",
+	"keywords": [ "directory", "listings", "grid" ],
+	"supports": { "html": false, "align": [ "wide", "full" ] },
+	"attributes": {
+		"type": { "type": "string", "default": "" },
+		"perPage": { "type": "number", "default": 12 },
+		"category": { "type": "number", "default": 0 }
+	},
+	"editorScript": "lodestar-blocks",
+	"style": "lodestar",
+	"render": "file:./render.php"
+}

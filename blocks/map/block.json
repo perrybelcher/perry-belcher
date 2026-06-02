@@ -1,0 +1,20 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lodestar/map",
+	"version": "0.1.0",
+	"title": "Lodestar Map",
+	"category": "lodestar",
+	"icon": "location-alt",
+	"description": "A clustered map of geocoded listings.",
+	"textdomain": "lodestar",
+	"keywords": [ "directory", "map", "geo" ],
+	"supports": { "html": false, "align": [ "wide", "full" ] },
+	"attributes": {
+		"type": { "type": "string", "default": "" },
+		"height": { "type": "number", "default": 420 }
+	},
+	"editorScript": "lodestar-blocks",
+	"style": "lodestar",
+	"render": "file:./render.php"
+}

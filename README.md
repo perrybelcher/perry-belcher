@@ -48,8 +48,23 @@ Built phase-by-phase, gated on each phase's Definition of Done.
 | Phase | Scope                                   | Status |
 |-------|-----------------------------------------|--------|
 | 0     | Scaffold & infrastructure               | ✅ done |
-| 1     | Data layer (50k / <150ms facet query)   | ⏳ next |
-| 2–9   | Types, submission, search, AEO, money…  | ☐      |
+| 1     | Data layer (50k / <150ms facet query)   | ✅ done |
+| 2     | Directory types & field/form system     | ✅ done |
+| 3     | Front-end submission & user dashboard    | ✅ done |
+| 4     | Search, faceting & maps                  | ✅ done |
+| 5     | AEO/GEO engine (the differentiator)      | ✅ done |
+| 6     | Monetization                             | ✅ done |
+| 7     | AI intake & citability scoring           | ✅ done |
+| 8     | API surface (headless-ready)             | ✅ done |
+| 9     | Blocks, templates & polish               | ✅ done |
+
+All ten phases (0–9) are built. CI (`.github/workflows/ci.yml`) runs PHPCS, the
+unit suite (no WordPress), the WP+MySQL integration suite, the 50k facet
+benchmark (SQLite proxy **and** authoritative MySQL), and JS checks.
+
+The Phase 1 faceted-search bet is validated by `tests/benchmark/` — the real
+`QueryBuilder` output runs index-driven (bounding-box prefilter + indexed facet
+lookups), not via `wp_postmeta` self-joins.
 
 ## License
 

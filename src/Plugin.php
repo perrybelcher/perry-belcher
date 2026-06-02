@@ -64,7 +64,130 @@ final class Plugin {
 		$this->booted = true;
 
 		add_action( 'init', array( $this, 'load_textdomain' ) );
+		add_action( 'init', array( $this, 'register_content_types' ) );
+		add_action( 'init', array( $this, 'register_frontend' ) );
+		add_action( 'init', array( $this, 'register_aeo' ) );
+		add_action( 'init', array( $this, 'register_monetize' ) );
+		add_action( 'init', array( $this, 'register_ai' ) );
+		add_action( 'init', array( $this, 'register_api' ) );
+		( new Blocks\Registrar() )->register();
 		add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
+
+		if ( is_admin() ) {
+			$this->register_admin();
+		}
+	}
+
+	/**
+	 * Wire monetization: webhook endpoint + the featured/expiry cron sweep.
+	 */
+	public function register_monetize(): void {
+		global $wpdb;
+
+		$featured = new Monetize\FeaturedManager( $wpdb );
+
+		// Reuse the daily maintenance cron scheduled by the Activator.
+		add_action( Install\Activator::CRON_HOOK, array( $featured, 'sweep' ) );
+
+		( new Monetize\WebhookController(
+			Monetize\Gateways\GatewayManager::from_config(),
+			new Monetize\OrderManager( $wpdb ),
+			$featured,
+			new Monetize\PlanManager( $wpdb ),
+			$wpdb
+		) )->register();
+	}
+
+	/**
+	 * Wire the AI layer: enrichment endpoint + citability scoring on save.
+	 */
+	public function register_ai(): void {
+		global $wpdb;
+
+		$client = Ai\AiClient::from_config();
+		$fields = new DirectoryType\FieldManager( $wpdb );
+
+		( new Ai\IntakeController(
+			new Ai\ListingEnricher( $client, $fields ),
+			new DirectoryType\DirectoryTypeManager( $wpdb ),
+			new Data\ListingRepository( $wpdb ),
+			$fields,
+			$wpdb
+		) )->register();
+	}
+
+	/**
+	 * Wire the headless REST API surface.
+	 */
+	public function register_api(): void {
+		global $wpdb;
+
+		( new Api\RestController(
+			new Data\ListingRepository( $wpdb ),
+			new DirectoryType\DirectoryTypeManager( $wpdb ),
+			new DirectoryType\FieldManager( $wpdb ),
+			new Monetize\ClaimManager( $wpdb ),
+			new Data\ReviewRepository( $wpdb ),
+			Api\RateLimiter::from_transients()
+		) )->register();
+	}
+
+	/**
+	 * Wire the AEO/GEO engine (JSON-LD, hub pages, sitemaps).
+	 */
+	public function register_aeo(): void {
+		global $wpdb;
+
+		$repo   = new Data\ListingRepository( $wpdb );
+		$types  = new DirectoryType\DirectoryTypeManager( $wpdb );
+		$fields = new DirectoryType\FieldManager( $wpdb );
+
+		( new Aeo\SchemaGenerator( $repo, $types, $fields ) )->register();
+		( new Aeo\ProgrammaticPages() )->register();
+		( new Aeo\SitemapProvider() )->register();
+	}
+
+	/**
+	 * Wire the front-end controllers (shortcodes + form/POST handlers).
+	 *
+	 * Registered for both front-end and admin-post.php requests so submissions
+	 * processed via admin-post.php are handled regardless of context.
+	 */
+	public function register_frontend(): void {
+		global $wpdb;
+
+		$repo      = new Data\ListingRepository( $wpdb );
+		$templates = new Frontend\TemplateLoader();
+		$types     = new DirectoryType\DirectoryTypeManager( $wpdb );
+		$fields    = new DirectoryType\FieldManager( $wpdb );
+
+		( new Frontend\Assets() )->register();
+		( new Frontend\SubmissionController( $repo, $types, $fields, $templates ) )->register();
+		( new Frontend\DashboardController( $repo, $templates ) )->register();
+		( new Frontend\SearchController( $repo, $types, $fields, $templates ) )->register();
+	}
+
+	/**
+	 * Wire the admin screens (directory types & fields).
+	 */
+	private function register_admin(): void {
+		global $wpdb;
+
+		$type_admin = new Admin\DirectoryTypeAdmin(
+			new DirectoryType\DirectoryTypeManager( $wpdb ),
+			new DirectoryType\FieldManager( $wpdb )
+		);
+
+		add_action( 'admin_init', array( $type_admin, 'handle_post' ) );
+		add_action( 'admin_menu', array( new Admin\AdminMenu( $type_admin ), 'register' ) );
+	}
+
+	/**
+	 * Register the listing CPT and its taxonomies.
+	 */
+	public function register_content_types(): void {
+		( new PostType\ListingPostType() )->register();
+		( new PostType\Taxonomies() )->register();
 	}
 
 	/**
