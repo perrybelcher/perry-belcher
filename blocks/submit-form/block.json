@@ -1,0 +1,19 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lodestar/submit-form",
+	"version": "0.1.0",
+	"title": "Lodestar Submit Listing",
+	"category": "lodestar",
+	"icon": "plus-alt",
+	"description": "Front-end form for submitting or editing a listing.",
+	"textdomain": "lodestar",
+	"keywords": [ "directory", "submit", "listing" ],
+	"supports": { "html": false, "align": [ "wide" ] },
+	"attributes": {
+		"type": { "type": "string", "default": "" }
+	},
+	"editorScript": "lodestar-blocks",
+	"style": "lodestar",
+	"render": "file:./render.php"
+}

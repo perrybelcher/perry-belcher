@@ -105,7 +105,10 @@ src/
   Api/                  RestController (/wp-json/lodestar/v1/*), Schemas (+ OpenAPI), RateLimiter
   Data/ (Phase 8)       ReviewRepository (pending reviews + rating recompute)
   Admin/                AdminMenu, DirectoryTypeAdmin (Settings, ListingsTable to come)
-blocks/                  Gutenberg source (search-form, listings-grid, single-listing, map, submit-form)
+src/Blocks/              Registrar (register category + blocks) + Renderer (server render → controllers)
+blocks/                  Gutenberg block.json + render.php per block (search-form, submit-form, listings-grid, single-listing, map)
+.github/workflows/ci.yml CI: phpcs, unit (no-WP), integration (WP+MySQL), benchmark (sqlite+mysql), js
+bin/install-wp-tests.sh  WP test-suite installer for CI/local
 templates/               default, override-able markup (submit-form, dashboard, search, …)
 assets/                  plain (un-built) scoped css/js — lodestar.css, lodestar-map.js
 build/                   compiled assets (gitignored source)
@@ -211,7 +214,19 @@ tests/                   PHPUnit + WP test suite
   (fixed-window, injected store+clock, transient-backed in prod),
   `Data\ReviewRepository` (pending reviews + rating recompute). Pure
   schema/limiter logic + the `ListingFormData::map_fields` split are unit-tested.
-- **Phase 9 — Blocks, templates & theme-agnostic polish.**
+- **Phase 9 — Blocks, templates & theme-agnostic polish.** ✅ *(current)* Five
+  **dynamic, server-rendered** blocks in `blocks/` (search-form, submit-form,
+  listings-grid, single-listing, map) — each a `block.json` + `render.php` that
+  delegates to `Blocks\Renderer` (reuses the controllers, so block output ==
+  shortcode output and stays update-safe; no compiled save markup to go stale).
+  `Blocks\Registrar` adds the `lodestar` category + registers each block; a
+  single **build-free** plain-JS editor bundle (`assets/js/lodestar-blocks.js`,
+  global `wp` + ServerSideRender preview) is referenced by every block.json.
+  New override-able `listings-grid`/`single-listing` templates; scoped
+  `lodestar-` CSS only. **CI** (`.github/workflows/ci.yml`): PHPCS, a no-WP unit
+  suite (`phpunit-unit.xml.dist`, PHP 8.1–8.3), a WP+MySQL integration suite
+  (`bin/install-wp-tests.sh`), the 50k facet benchmark on the SQLite proxy AND
+  authoritative MySQL, and JS syntax checks.
 
 ## Open config flags (decided as settings, defaults noted)
 

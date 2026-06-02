@@ -1,0 +1,155 @@
+name: CI
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: PHPCS (WordPress-Extra)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          tools: composer
+          coverage: none
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+      - name: Lint
+        run: composer lint
+
+  unit:
+    name: Unit tests (no WordPress) — PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ "8.1", "8.2", "8.3" ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer
+          coverage: none
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+      - name: Run unit suite
+        run: vendor/bin/phpunit -c phpunit-unit.xml.dist
+
+  integration:
+    name: Integration (WordPress + MySQL) — PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ "8.1", "8.3" ]
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -proot"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mysqli, pdo_mysql
+          tools: composer
+          coverage: none
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+      - name: Install WP test suite
+        run: |
+          chmod +x bin/install-wp-tests.sh
+          bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 latest
+      - name: Run full suite
+        env:
+          WP_TESTS_DIR: /tmp/wordpress-tests-lib
+        run: vendor/bin/phpunit
+
+  benchmark:
+    name: Facet benchmark gate (SQLite proxy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: sqlite3
+          coverage: none
+      - name: Run 50k facet + radius benchmark (must be < 150ms)
+        run: php tests/benchmark/facet-benchmark.php 50000 30
+
+  mysql-benchmark:
+    name: Facet benchmark (authoritative, MySQL)
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: lodestar_bench
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -proot"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: pdo_mysql
+          coverage: none
+      - name: Create benchmark tables
+        run: |
+          mysql -h127.0.0.1 -uroot -proot lodestar_bench <<'SQL'
+          CREATE TABLE wp_lodestar_listing_data (
+            listing_id BIGINT UNSIGNED PRIMARY KEY, directory_type_id INT UNSIGNED NOT NULL DEFAULT 0,
+            plan_id INT UNSIGNED NULL, lat DECIMAL(10,7) NULL, lng DECIMAL(10,7) NULL, geohash VARCHAR(12) NULL,
+            price DECIMAL(12,2) NULL, rating_avg DECIMAL(3,2) NOT NULL DEFAULT 0, rating_count INT UNSIGNED NOT NULL DEFAULT 0,
+            is_featured TINYINT(1) NOT NULL DEFAULT 0, featured_until DATETIME NULL, expires_at DATETIME NULL,
+            view_count INT UNSIGNED NOT NULL DEFAULT 0, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL,
+            KEY directory_type_id (directory_type_id), KEY latlng (lat,lng), KEY price (price), KEY rating_avg (rating_avg), KEY featured (is_featured,featured_until)
+          ) ENGINE=InnoDB;
+          CREATE TABLE wp_lodestar_field_index (
+            id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT, listing_id BIGINT UNSIGNED NOT NULL, field_key VARCHAR(64) NOT NULL,
+            value_text VARCHAR(191) NULL, value_num DECIMAL(16,4) NULL, value_date DATETIME NULL,
+            KEY field_text (field_key,value_text), KEY field_num (field_key,value_num), KEY listing_id (listing_id)
+          ) ENGINE=InnoDB;
+          CREATE TABLE wp_posts ( ID BIGINT UNSIGNED PRIMARY KEY, post_status VARCHAR(20) NOT NULL, post_type VARCHAR(20) NOT NULL, KEY ts (post_type,post_status) ) ENGINE=InnoDB;
+          SQL
+      - name: Seed wp_posts rows for the join
+        run: |
+          php -r '$p=new PDO("mysql:host=127.0.0.1;dbname=lodestar_bench","root","root");$p->beginTransaction();$s=$p->prepare("INSERT INTO wp_posts (ID,post_status,post_type) VALUES (?,?,\"ld_listing\")");for($i=1;$i<=50000;$i++){$s->execute([$i, $i%10===0?"pending":"publish"]);}$p->commit();'
+      - name: Run authoritative benchmark
+        env:
+          LODESTAR_BENCH_DRIVER: mysql
+          LODESTAR_BENCH_MYSQL_DSN: "mysql:host=127.0.0.1;dbname=lodestar_bench;charset=utf8mb4"
+          LODESTAR_BENCH_MYSQL_USER: root
+          LODESTAR_BENCH_MYSQL_PASS: root
+        run: php tests/benchmark/facet-benchmark.php 50000 30
+
+  js:
+    name: JS syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+      - name: Check plain-JS assets
+        run: |
+          for f in assets/js/*.js; do node --check "$f"; done

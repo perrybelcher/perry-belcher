@@ -162,3 +162,101 @@
 	padding: 0.5rem 1rem;
 	margin-bottom: var(--lodestar-gap);
 }
+
+/* Grid + cards (blocks) ---------------------------------------------------- */
+
+.lodestar-grid__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: var(--lodestar-gap);
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.lodestar-card {
+	border: 1px solid var(--lodestar-border);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.lodestar-card--featured {
+	border-color: var(--lodestar-accent);
+	box-shadow: 0 0 0 1px var(--lodestar-accent);
+}
+
+.lodestar-card__link {
+	display: block;
+	text-decoration: none;
+	color: inherit;
+}
+
+.lodestar-card__image {
+	width: 100%;
+	height: 150px;
+	object-fit: cover;
+	display: block;
+}
+
+.lodestar-card__title {
+	display: block;
+	font-weight: 600;
+	padding: 0.5rem 0.65rem 0;
+}
+
+.lodestar-card__rating {
+	display: block;
+	padding: 0.25rem 0.65rem 0.65rem;
+	color: #6b7280;
+	font-size: 0.9em;
+}
+
+/* Single listing ----------------------------------------------------------- */
+
+.lodestar-single__fields {
+	display: grid;
+	grid-template-columns: max-content 1fr;
+	gap: 0.35rem 1rem;
+	margin: 0 0 var(--lodestar-gap);
+}
+
+.lodestar-single__label {
+	font-weight: 600;
+}
+
+.lodestar-single__value {
+	margin: 0;
+}
+
+/* FAQ ---------------------------------------------------------------------- */
+
+.lodestar-faq__item {
+	border-bottom: 1px solid var(--lodestar-border);
+	padding: 0.5rem 0;
+}
+
+.lodestar-faq__q {
+	cursor: pointer;
+	font-weight: 600;
+}
+
+/* Intake ------------------------------------------------------------------- */
+
+.lodestar-intake {
+	border: 1px dashed var(--lodestar-border);
+	border-radius: 8px;
+	padding: 0.75rem 1rem;
+	margin-bottom: var(--lodestar-gap);
+}
+
+.lodestar-intake__row {
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.lodestar-intake__note {
+	color: #6b7280;
+	font-size: 0.85em;
+	margin: 0.35rem 0 0;
+}

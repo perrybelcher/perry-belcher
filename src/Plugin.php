@@ -70,6 +70,7 @@ final class Plugin {
 		add_action( 'init', array( $this, 'register_monetize' ) );
 		add_action( 'init', array( $this, 'register_ai' ) );
 		add_action( 'init', array( $this, 'register_api' ) );
+		( new Blocks\Registrar() )->register();
 		add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
 
 		if ( is_admin() ) {

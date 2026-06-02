@@ -1,0 +1,20 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "lodestar/search-form",
+	"version": "0.1.0",
+	"title": "Lodestar Search",
+	"category": "lodestar",
+	"icon": "search",
+	"description": "Faceted directory search with results and an optional map.",
+	"textdomain": "lodestar",
+	"keywords": [ "directory", "search", "facets" ],
+	"supports": { "html": false, "align": [ "wide", "full" ] },
+	"attributes": {
+		"type": { "type": "string", "default": "" },
+		"showMap": { "type": "boolean", "default": true }
+	},
+	"editorScript": "lodestar-blocks",
+	"style": "lodestar",
+	"render": "file:./render.php"
+}

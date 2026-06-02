@@ -56,7 +56,11 @@ Built phase-by-phase, gated on each phase's Definition of Done.
 | 6     | Monetization                             | ✅ done |
 | 7     | AI intake & citability scoring           | ✅ done |
 | 8     | API surface (headless-ready)             | ✅ done |
-| 9     | Blocks, templates & polish               | ⏳ next |
+| 9     | Blocks, templates & polish               | ✅ done |
+
+All ten phases (0–9) are built. CI (`.github/workflows/ci.yml`) runs PHPCS, the
+unit suite (no WordPress), the WP+MySQL integration suite, the 50k facet
+benchmark (SQLite proxy **and** authoritative MySQL), and JS checks.
 
 The Phase 1 faceted-search bet is validated by `tests/benchmark/` — the real
 `QueryBuilder` output runs index-driven (bounding-box prefilter + indexed facet
