@@ -94,4 +94,38 @@ final class Settings {
 	public static function default_radius_km(): float {
 		return (float) apply_filters( 'lodestar_default_radius_km', (float) get_option( 'lodestar_default_radius_km', 25 ) );
 	}
+
+	/**
+	 * Active payment gateway. Default: stripe (native).
+	 *
+	 * @return string One of: stripe, paypal, woo.
+	 */
+	public static function payments_gateway(): string {
+		$value = defined( 'LODESTAR_PAYMENTS' ) ? (string) LODESTAR_PAYMENTS : (string) get_option( 'lodestar_payments_gateway', 'stripe' );
+		$allowed = array( 'stripe', 'paypal', 'woo' );
+		$value   = in_array( $value, $allowed, true ) ? $value : 'stripe';
+
+		return (string) apply_filters( 'lodestar_payments_gateway', $value );
+	}
+
+	/**
+	 * ISO currency code for prices/checkout. Default: USD.
+	 */
+	public static function currency(): string {
+		return strtoupper( (string) apply_filters( 'lodestar_currency', (string) get_option( 'lodestar_currency', 'USD' ) ) );
+	}
+
+	/**
+	 * Stripe secret key (server-side only).
+	 */
+	public static function stripe_secret_key(): string {
+		return defined( 'LODESTAR_STRIPE_SECRET' ) ? (string) LODESTAR_STRIPE_SECRET : (string) get_option( 'lodestar_stripe_secret', '' );
+	}
+
+	/**
+	 * Stripe webhook signing secret (server-side only).
+	 */
+	public static function stripe_webhook_secret(): string {
+		return defined( 'LODESTAR_STRIPE_WEBHOOK_SECRET' ) ? (string) LODESTAR_STRIPE_WEBHOOK_SECRET : (string) get_option( 'lodestar_stripe_webhook_secret', '' );
+	}
 }

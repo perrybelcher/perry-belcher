@@ -100,7 +100,7 @@ src/
   Frontend/             SubmissionController, DashboardController, SearchController, SearchRequest, TemplateLoader, FieldSanitizer, ListingFormData, MapRenderer, Assets
   Geo/                  GeoPoint, GeocoderProvider, Geocoder, RadiusQuery, Provider/{Abstract,Nominatim,Google,Mapbox}
   Aeo/                  SchemaGenerator (JSON-LD), FaqBlock, ProgrammaticPages (hub pages), SitemapProvider
-  Monetize/             PlanManager, FeaturedManager, ClaimManager, Gateways/*
+  Monetize/             Plan, PlanManager, OrderManager, FeaturedManager, ClaimManager, WebhookController, Gateways/{GatewayInterface,Stripe,Paypal,Woo,GatewayManager,CheckoutSession,WebhookEvent}
   Ai/                   AiClient, Adapters/*, ListingEnricher, CitabilityScorer
   Api/                  RestController, Schemas
   Admin/                AdminMenu, DirectoryTypeAdmin (Settings, ListingsTable to come)
@@ -172,7 +172,19 @@ tests/                   PHPUnit + WP test suite
   + CollectionPage JSON-LD), `Aeo\SitemapProvider` (dedicated chunked hub
   sitemap atop WP core + pure `chunk()` helper). Pure builders are unit-tested;
   WP routing/output is thin glue.
-- **Phase 6 — Monetization.**
+- **Phase 6 — Monetization.** ✅ *(current)* `Monetize\Plan`/`PlanManager`
+  (plans CRUD + `within_limit` submission gating), `Monetize\OrderManager`
+  (orders + allowlisted status machine), `Monetize\FeaturedManager`
+  (`feature`/`unfeature` + daily cron `sweep` that un-features past
+  `featured_until` and drafts past `expires_at`; pure `is_active`/`is_expired`),
+  `Monetize\ClaimManager` (claim → approve transfers post ownership +
+  `claim_status`; pure `can_transition`), and gateways behind
+  `Gateways\GatewayInterface` (`StripeGateway` with tested HMAC
+  `verify_signature` + `map_status` + `to_minor_units`; `PaypalGateway`
+  refuses unverified webhooks; `WooGateway` bridge; `GatewayManager` registry).
+  `Monetize\WebhookController` (admin-post endpoint) verifies, updates the order,
+  and fulfils (attach plan + feature) only on a verified `paid` event. Pure
+  security/state logic is unit-tested; cron sweep reuses the Activator cron.
 - **Phase 7 — AI intake & citability scoring.** (Never auto-publish AI output.)
 - **Phase 8 — API surface** (headless-ready).
 - **Phase 9 — Blocks, templates & theme-agnostic polish.**

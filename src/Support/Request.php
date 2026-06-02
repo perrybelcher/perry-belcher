@@ -30,6 +30,17 @@ final class Request {
 		return isset( $_REQUEST[ $key ] );
 	}
 
+	/**
+	 * Read an HTTP request header (from $_SERVER), sanitised.
+	 *
+	 * @param string $name Header name, e.g. 'Stripe-Signature'.
+	 */
+	public static function header( string $name ): string {
+		$key = 'HTTP_' . strtoupper( str_replace( '-', '_', $name ) );
+
+		return isset( $_SERVER[ $key ] ) ? sanitize_text_field( wp_unslash( $_SERVER[ $key ] ) ) : '';
+	}
+
 	public static function postText( string $key, string $default = '' ): string {
 		if ( ! isset( $_POST[ $key ] ) ) {
 			return $default;

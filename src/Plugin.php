@@ -67,11 +67,32 @@ final class Plugin {
 		add_action( 'init', array( $this, 'register_content_types' ) );
 		add_action( 'init', array( $this, 'register_frontend' ) );
 		add_action( 'init', array( $this, 'register_aeo' ) );
+		add_action( 'init', array( $this, 'register_monetize' ) );
 		add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
 
 		if ( is_admin() ) {
 			$this->register_admin();
 		}
+	}
+
+	/**
+	 * Wire monetization: webhook endpoint + the featured/expiry cron sweep.
+	 */
+	public function register_monetize(): void {
+		global $wpdb;
+
+		$featured = new Monetize\FeaturedManager( $wpdb );
+
+		// Reuse the daily maintenance cron scheduled by the Activator.
+		add_action( Install\Activator::CRON_HOOK, array( $featured, 'sweep' ) );
+
+		( new Monetize\WebhookController(
+			Monetize\Gateways\GatewayManager::from_config(),
+			new Monetize\OrderManager( $wpdb ),
+			$featured,
+			new Monetize\PlanManager( $wpdb ),
+			$wpdb
+		) )->register();
 	}
 
 	/**
