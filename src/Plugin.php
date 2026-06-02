@@ -66,6 +66,25 @@ final class Plugin {
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 		add_action( 'init', array( $this, 'register_content_types' ) );
 		add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
+
+		if ( is_admin() ) {
+			$this->register_admin();
+		}
+	}
+
+	/**
+	 * Wire the admin screens (directory types & fields).
+	 */
+	private function register_admin(): void {
+		global $wpdb;
+
+		$type_admin = new Admin\DirectoryTypeAdmin(
+			new DirectoryType\DirectoryTypeManager( $wpdb ),
+			new DirectoryType\FieldManager( $wpdb )
+		);
+
+		add_action( 'admin_init', array( $type_admin, 'handle_post' ) );
+		add_action( 'admin_menu', array( new Admin\AdminMenu( $type_admin ), 'register' ) );
 	}
 
 	/**

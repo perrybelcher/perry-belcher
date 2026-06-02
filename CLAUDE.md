@@ -95,14 +95,15 @@ src/
     MigrationRunner.php   versioned dbDelta migrations, reads lodestar_migrations
   Data/                  ListingRepository, FieldIndexer, QueryBuilder, SearchQuery
   PostType/             ListingPostType, Taxonomies
-  DirectoryType/        DirectoryTypeManager, FieldManager, FormBuilder
+  DirectoryType/        DirectoryType + FieldDefinition DTOs, DirectoryTypeManager, FieldManager, FormBuilder
+  Support/              Request (the single $_POST/$_GET sanitising layer)
   Frontend/             SubmissionController, DashboardController, SearchController, TemplateLoader
   Geo/                  Geocoder, RadiusQuery
   Aeo/                  SchemaGenerator, ProgrammaticPages, FaqBlock, SitemapProvider
   Monetize/             PlanManager, FeaturedManager, ClaimManager, Gateways/*
   Ai/                   AiClient, Adapters/*, ListingEnricher, CitabilityScorer
   Api/                  RestController, Schemas
-  Admin/                AdminMenu, Settings, ListingsTable
+  Admin/                AdminMenu, DirectoryTypeAdmin (Settings, ListingsTable to come)
 blocks/                  Gutenberg source (search-form, listings-grid, single-listing, map, submit-form)
 templates/               default, override-able markup
 build/                   compiled assets (gitignored source)
@@ -126,7 +127,16 @@ tests/                   PHPUnit + WP test suite
   <150ms 3-facet + radius query** — see `tests/benchmark/` (run the `mysql`
   driver for the authoritative gate; the SQLite proxy proves the access pattern
   is index-driven).
-- **Phase 2 — Directory types & field/form system.**
+- **Phase 2 — Directory types & field/form system.** ✅ *(current)*
+  `DirectoryType`/`FieldDefinition` DTOs, `DirectoryTypeManager` +
+  `FieldManager` (CRUD on `directory_types`/`fields`, per-type field
+  isolation), `FormBuilder` (dynamic, escaped, theme-scoped markup),
+  `Admin\AdminMenu` + `Admin\DirectoryTypeAdmin` (secure CRUD UI), and
+  `Support\Request` (the single superglobal-sanitising layer). `FieldManager::
+  indexDefinitions()` feeds `FieldIndexer` so facetable fields flow into search;
+  richtext/file/geo are never indexed. **DoD met:** admin defines a type, adds
+  facetable + non-facetable fields, the form renders dynamically, and two types
+  coexist with isolated fields.
 - **Phase 3 — Front-end submission & user dashboard.** (Security review every
   write path.)
 - **Phase 4 — Search, faceting & maps.**
