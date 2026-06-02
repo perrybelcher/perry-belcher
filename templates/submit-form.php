@@ -34,6 +34,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	<?php endif; ?>
 
+	<?php if ( ! empty( $ai_enabled ) ) : ?>
+		<div class="lodestar-intake" data-lodestar-intake>
+			<label class="lodestar-field__label" for="lodestar-intake-input">
+				<?php esc_html_e( 'Auto-fill from a URL or description', 'lodestar' ); ?>
+			</label>
+			<div class="lodestar-intake__row">
+				<input type="url" id="lodestar-intake-input" class="lodestar-input lodestar-intake__input"
+					placeholder="<?php esc_attr_e( 'https://example.com or paste a description', 'lodestar' ); ?>" />
+				<button type="button" class="lodestar-button lodestar-intake__go"><?php esc_html_e( 'Suggest', 'lodestar' ); ?></button>
+			</div>
+			<p class="lodestar-intake__status" role="status" aria-live="polite"></p>
+			<p class="lodestar-intake__note"><?php esc_html_e( 'AI suggestions are a draft — review before submitting.', 'lodestar' ); ?></p>
+		</div>
+	<?php endif; ?>
+
 	<form class="lodestar-form" method="post" action="<?php echo esc_url( $action_url ); ?>" enctype="multipart/form-data">
 		<?php echo $hidden_fields; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built with esc_* in the controller. ?>
 

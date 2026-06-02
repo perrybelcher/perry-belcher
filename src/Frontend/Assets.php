@@ -53,6 +53,27 @@ final class Assets {
 			LODESTAR_VERSION,
 			true
 		);
+
+		wp_register_script(
+			'lodestar-intake',
+			LODESTAR_URL . 'assets/js/lodestar-intake.js',
+			array(),
+			LODESTAR_VERSION,
+			true
+		);
+	}
+
+	/**
+	 * Enqueue the AI intake script with its endpoint config.
+	 *
+	 * @param array<string,mixed> $config ajaxUrl, nonce, type.
+	 */
+	public static function enqueue_intake( array $config ): void {
+		self::enqueue_style();
+		if ( wp_script_is( 'lodestar-intake', 'registered' ) ) {
+			wp_enqueue_script( 'lodestar-intake' );
+			wp_localize_script( 'lodestar-intake', 'lodestarIntake', $config );
+		}
 	}
 
 	/**

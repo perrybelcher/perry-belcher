@@ -128,4 +128,52 @@ final class Settings {
 	public static function stripe_webhook_secret(): string {
 		return defined( 'LODESTAR_STRIPE_WEBHOOK_SECRET' ) ? (string) LODESTAR_STRIPE_WEBHOOK_SECRET : (string) get_option( 'lodestar_stripe_webhook_secret', '' );
 	}
+
+	/**
+	 * AI provider routing. Default: auto (Anthropic primary, Gemini fallback).
+	 *
+	 * @return string One of: auto, anthropic, gemini.
+	 */
+	public static function ai_provider(): string {
+		$value   = defined( 'LODESTAR_AI_PROVIDER' ) ? (string) LODESTAR_AI_PROVIDER : (string) get_option( 'lodestar_ai_provider', 'auto' );
+		$allowed = array( 'auto', 'anthropic', 'gemini' );
+		$value   = in_array( $value, $allowed, true ) ? $value : 'auto';
+
+		return (string) apply_filters( 'lodestar_ai_provider', $value );
+	}
+
+	/**
+	 * Anthropic API key (server-side only, never enqueued).
+	 */
+	public static function anthropic_key(): string {
+		return defined( 'LODESTAR_ANTHROPIC_KEY' ) ? (string) LODESTAR_ANTHROPIC_KEY : (string) get_option( 'lodestar_anthropic_key', '' );
+	}
+
+	/**
+	 * Gemini API key (server-side only, never enqueued).
+	 */
+	public static function gemini_key(): string {
+		return defined( 'LODESTAR_GEMINI_KEY' ) ? (string) LODESTAR_GEMINI_KEY : (string) get_option( 'lodestar_gemini_key', '' );
+	}
+
+	/**
+	 * Anthropic model id (filterable).
+	 */
+	public static function anthropic_model(): string {
+		return (string) apply_filters( 'lodestar_anthropic_model', (string) get_option( 'lodestar_anthropic_model', 'claude-sonnet-4-5' ) );
+	}
+
+	/**
+	 * Gemini model id (filterable).
+	 */
+	public static function gemini_model(): string {
+		return (string) apply_filters( 'lodestar_gemini_model', (string) get_option( 'lodestar_gemini_model', 'gemini-1.5-flash' ) );
+	}
+
+	/**
+	 * Whether any AI provider has a key configured.
+	 */
+	public static function ai_enabled(): bool {
+		return '' !== self::anthropic_key() || '' !== self::gemini_key();
+	}
 }

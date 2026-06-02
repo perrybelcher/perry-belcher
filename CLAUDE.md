@@ -101,7 +101,7 @@ src/
   Geo/                  GeoPoint, GeocoderProvider, Geocoder, RadiusQuery, Provider/{Abstract,Nominatim,Google,Mapbox}
   Aeo/                  SchemaGenerator (JSON-LD), FaqBlock, ProgrammaticPages (hub pages), SitemapProvider
   Monetize/             Plan, PlanManager, OrderManager, FeaturedManager, ClaimManager, WebhookController, Gateways/{GatewayInterface,Stripe,Paypal,Woo,GatewayManager,CheckoutSession,WebhookEvent}
-  Ai/                   AiClient, Adapters/*, ListingEnricher, CitabilityScorer
+  Ai/                   AiClient (auto router), ProviderResponse, AiLog, Adapters/{ProviderInterface,Abstract,Anthropic,Gemini}, ListingEnricher, CitabilityScorer, IntakeController
   Api/                  RestController, Schemas
   Admin/                AdminMenu, DirectoryTypeAdmin (Settings, ListingsTable to come)
 blocks/                  Gutenberg source (search-form, listings-grid, single-listing, map, submit-form)
@@ -185,7 +185,20 @@ tests/                   PHPUnit + WP test suite
   `Monetize\WebhookController` (admin-post endpoint) verifies, updates the order,
   and fulfils (attach plan + feature) only on a verified `paid` event. Pure
   security/state logic is unit-tested; cron sweep reuses the Activator cron.
-- **Phase 7 — AI intake & citability scoring.** (Never auto-publish AI output.)
+- **Phase 7 — AI intake & citability scoring.** ✅ *(current)* (Never
+  auto-publish AI output.) `Ai\AiClient` (`AI_PROVIDER=auto` router: ordered
+  providers, fail over on error, every attempt logged to `lodestar_ai_log`),
+  `Ai\Adapters\*` (`ProviderInterface` + `AbstractAdapter` with injectable
+  poster; `AnthropicAdapter` primary / `GeminiAdapter` fallback; keys server-side
+  only), `Ai\ListingEnricher` (URL/blurb → *proposed* title/description/fields/
+  faq; pure prompt + parse; parsed fields **whitelisted to the type's known
+  keys**; returns a draft for human review, never saves), `Ai\CitabilityScorer`
+  (pure deterministic 0–100 rubric — description/fields/FAQ/title/geo/rating/
+  terms/freshness — with actionable gaps), `Ai\IntakeController` (login+nonce
+  AJAX enrich endpoint returning only the proposal; recomputes + persists
+  `ai_citability_score` on save). Front-end: `assets/js/lodestar-intake.js`
+  pre-fills the form from the proposal (human-in-the-loop). Pure router/parse/
+  score logic is unit-tested.
 - **Phase 8 — API surface** (headless-ready).
 - **Phase 9 — Blocks, templates & theme-agnostic polish.**
 

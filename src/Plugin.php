@@ -68,6 +68,7 @@ final class Plugin {
 		add_action( 'init', array( $this, 'register_frontend' ) );
 		add_action( 'init', array( $this, 'register_aeo' ) );
 		add_action( 'init', array( $this, 'register_monetize' ) );
+		add_action( 'init', array( $this, 'register_ai' ) );
 		add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
 
 		if ( is_admin() ) {
@@ -91,6 +92,24 @@ final class Plugin {
 			new Monetize\OrderManager( $wpdb ),
 			$featured,
 			new Monetize\PlanManager( $wpdb ),
+			$wpdb
+		) )->register();
+	}
+
+	/**
+	 * Wire the AI layer: enrichment endpoint + citability scoring on save.
+	 */
+	public function register_ai(): void {
+		global $wpdb;
+
+		$client = Ai\AiClient::from_config();
+		$fields = new DirectoryType\FieldManager( $wpdb );
+
+		( new Ai\IntakeController(
+			new Ai\ListingEnricher( $client, $fields ),
+			new DirectoryType\DirectoryTypeManager( $wpdb ),
+			new Data\ListingRepository( $wpdb ),
+			$fields,
 			$wpdb
 		) )->register();
 	}

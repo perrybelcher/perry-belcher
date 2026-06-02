@@ -89,6 +89,18 @@ final class SubmissionController {
 
 		$errors = $this->take_errors();
 
+		// AI intake box (only when a provider is configured).
+		$ai_enabled = Settings::ai_enabled();
+		if ( $ai_enabled ) {
+			Assets::enqueue_intake(
+				array(
+					'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+					'nonce'   => wp_create_nonce( \Lodestar\Ai\IntakeController::NONCE ),
+					'type'    => $type->slug,
+				)
+			);
+		}
+
 		$hidden  = wp_nonce_field( self::NONCE, '_wpnonce', true, false );
 		$hidden .= '<input type="hidden" name="action" value="' . esc_attr( self::ACTION ) . '" />';
 		$hidden .= '<input type="hidden" name="directory_type_id" value="' . esc_attr( (string) $type->id ) . '" />';
@@ -106,6 +118,7 @@ final class SubmissionController {
 				'tags_value'    => (string) ( $prefill['tags'] ?? '' ),
 				'errors'        => $errors,
 				'is_edit'       => $listing_id > 0,
+				'ai_enabled'    => $ai_enabled,
 				'submit_label'  => $listing_id > 0 ? __( 'Update listing', 'lodestar' ) : __( 'Submit listing', 'lodestar' ),
 			)
 		);
