@@ -64,4 +64,34 @@ final class Settings {
 
 		return (string) apply_filters( 'lodestar_submit_page_url', $url );
 	}
+
+	/**
+	 * Geocoding/map provider. Default: nominatim (OSM, no API key friction).
+	 *
+	 * @return string One of: nominatim, google, mapbox.
+	 */
+	public static function geo_provider(): string {
+		$value   = (string) get_option( 'lodestar_geo_provider', 'nominatim' );
+		$allowed = array( 'nominatim', 'google', 'mapbox' );
+		$value   = in_array( $value, $allowed, true ) ? $value : 'nominatim';
+
+		return (string) apply_filters( 'lodestar_geo_provider', $value );
+	}
+
+	/**
+	 * Geocoding API key. Prefers the wp-config constant, then the option.
+	 * Server-side only — never enqueued.
+	 */
+	public static function geo_api_key(): string {
+		$key = defined( 'LODESTAR_GEO_API_KEY' ) ? (string) LODESTAR_GEO_API_KEY : (string) get_option( 'lodestar_geo_api_key', '' );
+
+		return (string) apply_filters( 'lodestar_geo_api_key', $key );
+	}
+
+	/**
+	 * Default radius (km) applied when a location search omits one.
+	 */
+	public static function default_radius_km(): float {
+		return (float) apply_filters( 'lodestar_default_radius_km', (float) get_option( 'lodestar_default_radius_km', 25 ) );
+	}
 }

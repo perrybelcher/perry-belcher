@@ -64,6 +64,25 @@ final class Request {
 		return isset( $_GET[ $key ] ) ? sanitize_key( wp_unslash( $_GET[ $key ] ) ) : $default;
 	}
 
+	/**
+	 * A GET value that may be a single string or an array of strings, each
+	 * sanitised with sanitize_text_field. Returns null when absent.
+	 *
+	 * @return string|string[]|null
+	 */
+	public static function getTextOrArray( string $key ) {
+		if ( ! isset( $_GET[ $key ] ) ) {
+			return null;
+		}
+
+		$value = wp_unslash( $_GET[ $key ] );
+		if ( is_array( $value ) ) {
+			return array_values( array_map( 'sanitize_text_field', $value ) );
+		}
+
+		return sanitize_text_field( $value );
+	}
+
 	public static function postBool( string $key ): bool {
 		return ! empty( $_POST[ $key ] );
 	}

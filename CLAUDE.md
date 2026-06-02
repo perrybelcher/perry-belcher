@@ -97,15 +97,16 @@ src/
   PostType/             ListingPostType, Taxonomies
   DirectoryType/        DirectoryType + FieldDefinition DTOs, DirectoryTypeManager, FieldManager, FormBuilder
   Support/              Request (single $_POST/$_GET sanitiser), Settings (config flags)
-  Frontend/             SubmissionController, DashboardController, TemplateLoader, FieldSanitizer, ListingFormData (SearchController in Phase 4)
-  Geo/                  Geocoder, RadiusQuery
+  Frontend/             SubmissionController, DashboardController, SearchController, SearchRequest, TemplateLoader, FieldSanitizer, ListingFormData, MapRenderer, Assets
+  Geo/                  GeoPoint, GeocoderProvider, Geocoder, RadiusQuery, Provider/{Abstract,Nominatim,Google,Mapbox}
   Aeo/                  SchemaGenerator, ProgrammaticPages, FaqBlock, SitemapProvider
   Monetize/             PlanManager, FeaturedManager, ClaimManager, Gateways/*
   Ai/                   AiClient, Adapters/*, ListingEnricher, CitabilityScorer
   Api/                  RestController, Schemas
   Admin/                AdminMenu, DirectoryTypeAdmin (Settings, ListingsTable to come)
 blocks/                  Gutenberg source (search-form, listings-grid, single-listing, map, submit-form)
-templates/               default, override-able markup
+templates/               default, override-able markup (submit-form, dashboard, search, …)
+assets/                  plain (un-built) scoped css/js — lodestar.css, lodestar-map.js
 build/                   compiled assets (gitignored source)
 tests/                   PHPUnit + WP test suite
 ```
@@ -149,7 +150,18 @@ tests/                   PHPUnit + WP test suite
   off, default status pending). **Every write path:** nonce + capability/
   ownership + sanitise; status is forced server-side (no self-publish); SQLi
   neutralised by prepared statements, XSS by sanitise-in + escape-out.
-- **Phase 4 — Search, faceting & maps.**
+- **Phase 4 — Search, faceting & maps.** ✅ *(current)*
+  `Frontend\SearchController` (`[lodestar_search]`, GET-driven faceted search +
+  pagination + sort, live against the custom tables via the Phase 1
+  QueryBuilder), `Frontend\SearchRequest` (pure args→SearchQuery mapper — only
+  facetable fields can filter), `Geo\Geocoder` (provider-agnostic: Nominatim
+  default / Google / Mapbox behind `Geo\Provider\*`, server-side keys, cached),
+  `Geo\RadiusQuery` (haversine + geohash covering prefixes), `Frontend\
+  MapRenderer` + `Frontend\Assets` (Leaflet + markercluster from CDN, enqueued
+  only where shortcodes render; plain JS in `assets/`, no build step). **DoD:**
+  faceted UI filters live; radius results ordered by distance; markers cluster.
+  The Gutenberg *map block* wrapper is deferred to Phase 9 (Blocks); the map
+  ships functionally now via the search template.
 - **Phase 5 — AEO/GEO engine** (the differentiator).
 - **Phase 6 — Monetization.**
 - **Phase 7 — AI intake & citability scoring.** (Never auto-publish AI output.)

@@ -87,8 +87,10 @@ final class Plugin {
 		$types     = new DirectoryType\DirectoryTypeManager( $wpdb );
 		$fields    = new DirectoryType\FieldManager( $wpdb );
 
+		( new Frontend\Assets() )->register();
 		( new Frontend\SubmissionController( $repo, $types, $fields, $templates ) )->register();
 		( new Frontend\DashboardController( $repo, $templates ) )->register();
+		( new Frontend\SearchController( $repo, $types, $fields, $templates ) )->register();
 	}
 
 	/**
