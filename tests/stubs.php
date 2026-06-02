@@ -102,3 +102,13 @@ if ( ! function_exists( 'esc_url_raw' ) ) {
 		return $url;
 	}
 }
+if ( ! function_exists( 'wp_json_encode' ) ) {
+	function wp_json_encode( $data, $options = 0, $depth = 512 ) {
+		return json_encode( $data, $options, $depth );
+	}
+}
+if ( ! function_exists( '_n' ) ) {
+	function _n( $single, $plural, $number, $domain = 'default' ) {
+		return 1 === (int) $number ? $single : $plural;
+	}
+}

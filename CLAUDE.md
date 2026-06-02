@@ -99,7 +99,7 @@ src/
   Support/              Request (single $_POST/$_GET sanitiser), Settings (config flags)
   Frontend/             SubmissionController, DashboardController, SearchController, SearchRequest, TemplateLoader, FieldSanitizer, ListingFormData, MapRenderer, Assets
   Geo/                  GeoPoint, GeocoderProvider, Geocoder, RadiusQuery, Provider/{Abstract,Nominatim,Google,Mapbox}
-  Aeo/                  SchemaGenerator, ProgrammaticPages, FaqBlock, SitemapProvider
+  Aeo/                  SchemaGenerator (JSON-LD), FaqBlock, ProgrammaticPages (hub pages), SitemapProvider
   Monetize/             PlanManager, FeaturedManager, ClaimManager, Gateways/*
   Ai/                   AiClient, Adapters/*, ListingEnricher, CitabilityScorer
   Api/                  RestController, Schemas
@@ -162,7 +162,16 @@ tests/                   PHPUnit + WP test suite
   faceted UI filters live; radius results ordered by distance; markers cluster.
   The Gutenberg *map block* wrapper is deferred to Phase 9 (Blocks); the map
   ships functionally now via the search template.
-- **Phase 5 — AEO/GEO engine** (the differentiator).
+- **Phase 5 — AEO/GEO engine** (the differentiator). ✅ *(current)*
+  `Aeo\SchemaGenerator` (per-listing JSON-LD on `wp_head`; @type +
+  field→property map are **configurable per directory type**, not hardcoded;
+  `build()` is pure; `render()` uses `JSON_HEX_TAG` so data can't break out of
+  the script tag), `Aeo\FaqBlock` (FAQPage JSON-LD + accessible `<details>`
+  render from listing `meta['faq']`), `Aeo\ProgrammaticPages` (category/location
+  term archives enriched into hubs: auto intro, comparison table, BreadcrumbList
+  + CollectionPage JSON-LD), `Aeo\SitemapProvider` (dedicated chunked hub
+  sitemap atop WP core + pure `chunk()` helper). Pure builders are unit-tested;
+  WP routing/output is thin glue.
 - **Phase 6 — Monetization.**
 - **Phase 7 — AI intake & citability scoring.** (Never auto-publish AI output.)
 - **Phase 8 — API surface** (headless-ready).

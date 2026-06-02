@@ -52,8 +52,9 @@ Built phase-by-phase, gated on each phase's Definition of Done.
 | 2     | Directory types & field/form system     | ✅ done |
 | 3     | Front-end submission & user dashboard    | ✅ done |
 | 4     | Search, faceting & maps                  | ✅ done |
-| 5     | AEO/GEO engine (the differentiator)      | ⏳ next |
-| 6–9   | Money, AI, API, blocks…                  | ☐      |
+| 5     | AEO/GEO engine (the differentiator)      | ✅ done |
+| 6     | Monetization                             | ⏳ next |
+| 7–9   | AI, API, blocks…                         | ☐      |
 
 The Phase 1 faceted-search bet is validated by `tests/benchmark/` — the real
 `QueryBuilder` output runs index-driven (bounding-box prefilter + indexed facet

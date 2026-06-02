@@ -66,11 +66,27 @@ final class Plugin {
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 		add_action( 'init', array( $this, 'register_content_types' ) );
 		add_action( 'init', array( $this, 'register_frontend' ) );
+		add_action( 'init', array( $this, 'register_aeo' ) );
 		add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
 
 		if ( is_admin() ) {
 			$this->register_admin();
 		}
+	}
+
+	/**
+	 * Wire the AEO/GEO engine (JSON-LD, hub pages, sitemaps).
+	 */
+	public function register_aeo(): void {
+		global $wpdb;
+
+		$repo   = new Data\ListingRepository( $wpdb );
+		$types  = new DirectoryType\DirectoryTypeManager( $wpdb );
+		$fields = new DirectoryType\FieldManager( $wpdb );
+
+		( new Aeo\SchemaGenerator( $repo, $types, $fields ) )->register();
+		( new Aeo\ProgrammaticPages() )->register();
+		( new Aeo\SitemapProvider() )->register();
 	}
 
 	/**
