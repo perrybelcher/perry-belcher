@@ -50,8 +50,9 @@ Built phase-by-phase, gated on each phase's Definition of Done.
 | 0     | Scaffold & infrastructure               | ✅ done |
 | 1     | Data layer (50k / <150ms facet query)   | ✅ done |
 | 2     | Directory types & field/form system     | ✅ done |
-| 3     | Front-end submission & user dashboard    | ⏳ next |
-| 4–9   | Search, AEO, money, AI, API, blocks…     | ☐      |
+| 3     | Front-end submission & user dashboard    | ✅ done |
+| 4     | Search, faceting & maps                  | ⏳ next |
+| 5–9   | AEO, money, AI, API, blocks…             | ☐      |
 
 The Phase 1 faceted-search bet is validated by `tests/benchmark/` — the real
 `QueryBuilder` output runs index-driven (bounding-box prefilter + indexed facet

@@ -95,5 +95,37 @@ final class Request {
 		return $out;
 	}
 
+	/**
+	 * Array of absolute integers from POST (e.g. taxonomy term IDs).
+	 *
+	 * @return int[]
+	 */
+	public static function postIntArray( string $key ): array {
+		if ( ! isset( $_POST[ $key ] ) || ! is_array( $_POST[ $key ] ) ) {
+			return array();
+		}
+
+		return array_values( array_filter( array_map( 'absint', (array) wp_unslash( $_POST[ $key ] ) ) ) );
+	}
+
+	/**
+	 * Unslashed (but NOT type-sanitised) array from POST.
+	 *
+	 * The only escape hatch in this layer: the caller MUST sanitise each value
+	 * itself, by field type, before use (see Frontend\FieldSanitizer). Used for
+	 * dynamic custom-field bundles whose sanitisation rule depends on the field
+	 * definition, which this generic layer cannot know.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public static function rawPostArray( string $key ): array {
+		if ( ! isset( $_POST[ $key ] ) || ! is_array( $_POST[ $key ] ) ) {
+			return array();
+		}
+
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- caller sanitises per field type.
+		return (array) wp_unslash( $_POST[ $key ] );
+	}
+
 	// phpcs:enable WordPress.Security.NonceVerification.Recommended
 }

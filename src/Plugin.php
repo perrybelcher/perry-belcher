@@ -65,11 +65,30 @@ final class Plugin {
 
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 		add_action( 'init', array( $this, 'register_content_types' ) );
+		add_action( 'init', array( $this, 'register_frontend' ) );
 		add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
 
 		if ( is_admin() ) {
 			$this->register_admin();
 		}
+	}
+
+	/**
+	 * Wire the front-end controllers (shortcodes + form/POST handlers).
+	 *
+	 * Registered for both front-end and admin-post.php requests so submissions
+	 * processed via admin-post.php are handled regardless of context.
+	 */
+	public function register_frontend(): void {
+		global $wpdb;
+
+		$repo      = new Data\ListingRepository( $wpdb );
+		$templates = new Frontend\TemplateLoader();
+		$types     = new DirectoryType\DirectoryTypeManager( $wpdb );
+		$fields    = new DirectoryType\FieldManager( $wpdb );
+
+		( new Frontend\SubmissionController( $repo, $types, $fields, $templates ) )->register();
+		( new Frontend\DashboardController( $repo, $templates ) )->register();
 	}
 
 	/**

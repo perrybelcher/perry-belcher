@@ -96,8 +96,8 @@ src/
   Data/                  ListingRepository, FieldIndexer, QueryBuilder, SearchQuery
   PostType/             ListingPostType, Taxonomies
   DirectoryType/        DirectoryType + FieldDefinition DTOs, DirectoryTypeManager, FieldManager, FormBuilder
-  Support/              Request (the single $_POST/$_GET sanitising layer)
-  Frontend/             SubmissionController, DashboardController, SearchController, TemplateLoader
+  Support/              Request (single $_POST/$_GET sanitiser), Settings (config flags)
+  Frontend/             SubmissionController, DashboardController, TemplateLoader, FieldSanitizer, ListingFormData (SearchController in Phase 4)
   Geo/                  Geocoder, RadiusQuery
   Aeo/                  SchemaGenerator, ProgrammaticPages, FaqBlock, SitemapProvider
   Monetize/             PlanManager, FeaturedManager, ClaimManager, Gateways/*
@@ -137,8 +137,18 @@ tests/                   PHPUnit + WP test suite
   richtext/file/geo are never indexed. **DoD met:** admin defines a type, adds
   facetable + non-facetable fields, the form renders dynamically, and two types
   coexist with isolated fields.
-- **Phase 3 — Front-end submission & user dashboard.** (Security review every
-  write path.)
+- **Phase 3 — Front-end submission & user dashboard.** ✅ *(current)*
+  `Frontend\SubmissionController` (`[lodestar_submit]`, add/edit via
+  admin-post.php), `Frontend\DashboardController` (`[lodestar_dashboard]`,
+  manage own listings + delete), `Frontend\TemplateLoader` (theme-override
+  aware: child/parent theme `lodestar/` → plugin `templates/`). Security-
+  critical input handling is factored into pure, tested units:
+  `Frontend\FieldSanitizer` (per-type sanitisation, option whitelisting, geo
+  bounds, XSS strip) and `Frontend\ListingFormData` (validation + facetable/
+  meta/geo split). `Support\Settings` holds the config flags (guest submissions
+  off, default status pending). **Every write path:** nonce + capability/
+  ownership + sanitise; status is forced server-side (no self-publish); SQLi
+  neutralised by prepared statements, XSS by sanitise-in + escape-out.
 - **Phase 4 — Search, faceting & maps.**
 - **Phase 5 — AEO/GEO engine** (the differentiator).
 - **Phase 6 — Monetization.**
