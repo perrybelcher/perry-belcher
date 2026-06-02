@@ -102,7 +102,8 @@ src/
   Aeo/                  SchemaGenerator (JSON-LD), FaqBlock, ProgrammaticPages (hub pages), SitemapProvider
   Monetize/             Plan, PlanManager, OrderManager, FeaturedManager, ClaimManager, WebhookController, Gateways/{GatewayInterface,Stripe,Paypal,Woo,GatewayManager,CheckoutSession,WebhookEvent}
   Ai/                   AiClient (auto router), ProviderResponse, AiLog, Adapters/{ProviderInterface,Abstract,Anthropic,Gemini}, ListingEnricher, CitabilityScorer, IntakeController
-  Api/                  RestController, Schemas
+  Api/                  RestController (/wp-json/lodestar/v1/*), Schemas (+ OpenAPI), RateLimiter
+  Data/ (Phase 8)       ReviewRepository (pending reviews + rating recompute)
   Admin/                AdminMenu, DirectoryTypeAdmin (Settings, ListingsTable to come)
 blocks/                  Gutenberg source (search-form, listings-grid, single-listing, map, submit-form)
 templates/               default, override-able markup (submit-form, dashboard, search, …)
@@ -199,7 +200,17 @@ tests/                   PHPUnit + WP test suite
   `ai_citability_score` on save). Front-end: `assets/js/lodestar-intake.js`
   pre-fills the form from the proposal (human-in-the-loop). Pure router/parse/
   score logic is unit-tested.
-- **Phase 8 — API surface** (headless-ready).
+- **Phase 8 — API surface** (headless-ready). ✅ *(current)*
+  `Api\RestController` (`/wp-json/lodestar/v1/*`: GET/POST `listings`,
+  GET/PUT/DELETE `listings/{id}`, POST `listings/{id}/claim`,
+  POST `listings/{id}/reviews`, GET `directory-types`, GET `openapi`). Reads are
+  public; writes require auth + are rate-limited; input reuses the SAME
+  `FieldSanitizer`/`ListingFormData`/`SearchRequest` path as the forms (one
+  trusted way into the DB — no second sanitiser to drift). `Api\Schemas` (pure
+  arg defs + public/owner response shaping + OpenAPI 3 doc), `Api\RateLimiter`
+  (fixed-window, injected store+clock, transient-backed in prod),
+  `Data\ReviewRepository` (pending reviews + rating recompute). Pure
+  schema/limiter logic + the `ListingFormData::map_fields` split are unit-tested.
 - **Phase 9 — Blocks, templates & theme-agnostic polish.**
 
 ## Open config flags (decided as settings, defaults noted)

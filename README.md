@@ -55,8 +55,8 @@ Built phase-by-phase, gated on each phase's Definition of Done.
 | 5     | AEO/GEO engine (the differentiator)      | ✅ done |
 | 6     | Monetization                             | ✅ done |
 | 7     | AI intake & citability scoring           | ✅ done |
-| 8     | API surface (headless-ready)             | ⏳ next |
-| 9     | Blocks, templates & polish               | ☐      |
+| 8     | API surface (headless-ready)             | ✅ done |
+| 9     | Blocks, templates & polish               | ⏳ next |
 
 The Phase 1 faceted-search bet is validated by `tests/benchmark/` — the real
 `QueryBuilder` output runs index-driven (bounding-box prefilter + indexed facet

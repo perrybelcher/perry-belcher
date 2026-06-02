@@ -69,6 +69,7 @@ final class Plugin {
 		add_action( 'init', array( $this, 'register_aeo' ) );
 		add_action( 'init', array( $this, 'register_monetize' ) );
 		add_action( 'init', array( $this, 'register_ai' ) );
+		add_action( 'init', array( $this, 'register_api' ) );
 		add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
 
 		if ( is_admin() ) {
@@ -111,6 +112,22 @@ final class Plugin {
 			new Data\ListingRepository( $wpdb ),
 			$fields,
 			$wpdb
+		) )->register();
+	}
+
+	/**
+	 * Wire the headless REST API surface.
+	 */
+	public function register_api(): void {
+		global $wpdb;
+
+		( new Api\RestController(
+			new Data\ListingRepository( $wpdb ),
+			new DirectoryType\DirectoryTypeManager( $wpdb ),
+			new DirectoryType\FieldManager( $wpdb ),
+			new Monetize\ClaimManager( $wpdb ),
+			new Data\ReviewRepository( $wpdb ),
+			Api\RateLimiter::from_transients()
 		) )->register();
 	}
 

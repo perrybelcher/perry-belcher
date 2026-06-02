@@ -41,6 +41,13 @@ final class Request {
 		return isset( $_SERVER[ $key ] ) ? sanitize_text_field( wp_unslash( $_SERVER[ $key ] ) ) : '';
 	}
 
+	/**
+	 * The client IP (best-effort, sanitised) for rate-limit keys.
+	 */
+	public static function ip(): string {
+		return isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '0.0.0.0';
+	}
+
 	public static function postText( string $key, string $default = '' ): string {
 		if ( ! isset( $_POST[ $key ] ) ) {
 			return $default;

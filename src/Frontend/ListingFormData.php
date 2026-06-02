@@ -46,11 +46,38 @@ final class ListingFormData {
 			$errors[] = __( 'A title is required.', 'lodestar' );
 		}
 
-		$data = array(
-			'title'   => $title,
-			'content' => $content,
+		$data = array_merge(
+			array(
+				'title'   => $title,
+				'content' => $content,
+			),
+			self::map_fields( $fields, $defs, $errors )
 		);
 
+		foreach ( array( 'category', 'location', 'tag' ) as $taxonomy ) {
+			if ( ! empty( $terms[ $taxonomy ] ) ) {
+				$data[ $taxonomy ] = array_values( array_map( 'intval', (array) $terms[ $taxonomy ] ) );
+			}
+		}
+
+		return array(
+			'data'   => $data,
+			'errors' => $errors,
+		);
+	}
+
+	/**
+	 * Split sanitised field values into repository data: indexed facets,
+	 * non-facetable meta, and native geo columns. Pure and reusable (REST
+	 * partial updates use it without the required-field validation).
+	 *
+	 * @param array<string,mixed> $fields  Sanitised field_key => value(s).
+	 * @param FieldDefinition[]   $defs    Field definitions.
+	 * @param array<int,string>   $errors  Required-field errors accumulator (by reference).
+	 * @return array<string,mixed> Keys: fields, field_defs, meta, lat, lng.
+	 */
+	public static function map_fields( array $fields, array $defs, array &$errors = array() ): array {
+		$data         = array();
 		$index_values = array();
 		$index_defs   = array();
 		$meta         = array();
@@ -67,7 +94,6 @@ final class ListingFormData {
 				continue;
 			}
 
-			// Geo routes to the native, indexed lat/lng columns.
 			if ( FieldDefinition::INPUT_GEO === $field->inputType ) {
 				if ( is_array( $value ) && isset( $value['lat'], $value['lng'] ) ) {
 					$data['lat'] = (float) $value['lat'];
@@ -95,15 +121,6 @@ final class ListingFormData {
 			$data['meta'] = $meta;
 		}
 
-		foreach ( array( 'category', 'location', 'tag' ) as $taxonomy ) {
-			if ( ! empty( $terms[ $taxonomy ] ) ) {
-				$data[ $taxonomy ] = array_values( array_map( 'intval', (array) $terms[ $taxonomy ] ) );
-			}
-		}
-
-		return array(
-			'data'   => $data,
-			'errors' => $errors,
-		);
+		return $data;
 	}
 }
